@@ -543,8 +543,8 @@ void DisplayStreams(HWND hwnd)
                                               g - streamOrigSpeed[i] * incG,
                                               b - streamOrigSpeed[i] * incB)
                         );
-                        TextOut(hdc, x , y - (j * textHeight), (char*) (szBuffer + (rand() * COUNT / 32767)), 1);
-                    } else if (j==1) {
+                        TextOut(hdc, x, y, (char*) (szBuffer + (rand() * COUNT / 32767)), 1);
+                    } else if (j == 1) {
                         int incR = r / 3 / (SpeedDelay + 1);
                         int incG = g / 3 / (SpeedDelay + 1);
                         int incB = b / 3 / (SpeedDelay + 1);
