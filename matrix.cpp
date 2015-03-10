@@ -55,7 +55,7 @@ char szWinName[] = "MatrixSS";
 // - /p dddd  preview, when we first switch to the window properties screen savers dialog
 // - /s       starts the screensaver
 // -          no command line starts the config dialog
-int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpszArgs, int nWinMode)
+int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE /*hPrevInst*/, LPSTR lpszArgs, int nWinMode)
 {
     HWND hwnd;
     MSG msg;
@@ -65,7 +65,7 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpszArgs, int
 
     // set the values
     RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\louai\\Screensaver\\MatrixCode",
-                    0, "MatrixSS", 0, KEY_ALL_ACCESS, NULL, &hRegKey, &result);
+                    0, szWinName, 0, KEY_ALL_ACCESS, NULL, &hRegKey, &result);
 
     // if key was created
     if (result == REG_CREATED_NEW_KEY) {
@@ -199,7 +199,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
 }
 
 
-int OnCtlColor(HWND hDlg, HDC hDC)
+int OnCtlColor(HWND /*hDlg*/, HDC hDC)
 {
     SetTextColor(hDC, RGB(255, 255, 255));
     SetBkColor(hDC, RGB(0, 0, 0));
@@ -215,7 +215,6 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
     RECT rect;
     int cx, cy, x, y;
     int xpos, ypos;
-    int fwkeys;
     HDC hmemdc;
     PAINTSTRUCT ps;
 
@@ -282,7 +281,7 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
             y = ps.rcPaint.top;
             cx = ps.rcPaint.right - ps.rcPaint.left;
             cy = ps.rcPaint.bottom - ps.rcPaint.top;
-            if (hmemdc = CreateCompatibleDC(hdc))
+            if ((hmemdc = CreateCompatibleDC(hdc)))
                 if (SelectObject(hmemdc, hbitmap))
                     BitBlt(hdc, x, y, cx, cy, hmemdc, x, y, SRCCOPY);
 
@@ -316,7 +315,6 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
         case WM_MOUSEMOVE:
             xpos = LOWORD(lparam);
             ypos = HIWORD(lparam);
-            fwkeys = wparam;
 
             if (buttonState == 1) {
                 if (!((xpos >= 12) && (xpos <= 70) && (ypos >= 186) && (ypos <= 218))) {
@@ -334,7 +332,6 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
         case WM_LBUTTONDOWN:
             xpos = LOWORD(lparam);
             ypos = HIWORD(lparam);
-            fwkeys = wparam;
 
             if ((xpos >= 12) && (xpos <= 70) && (ypos >= 186) && (ypos <= 218)) {
                 buttonState = 1;
@@ -411,10 +408,10 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
 // The good stuff:
 
 
-static int startX[MAX];
-static int startY[MAX];
-static int streamSpeed[MAX];
-static int streamOrigSpeed[MAX];
+static UINT startX[MAX];
+static UINT startY[MAX];
+static UINT streamSpeed[MAX];
+static UINT streamOrigSpeed[MAX];
 static bool streamStatus[MAX];
 static unsigned long streamCount = 0;
 
@@ -429,9 +426,6 @@ void CheckUserDefinedValues()
     if (r > 255) r = 255;
     if (g > 255) g = 255;
     if (b > 255) b = 255;
-    if (r < 0) r = 0;
-    if (g < 0) g = 0;
-    if (b < 0) b = 0;
 }
 
 
@@ -443,7 +437,7 @@ static int textWidth = 8; // place holders recalculated in code
 void CreateDestroyStreams()
 {
     if (streamCount < MaxStream) {
-        for (int i = 0; i < MaxStream; i++) {
+        for (UINT i = 0; i < MaxStream; i++) {
             if (streamStatus[i] == false) {
                 streamCount++;
                 streamStatus[i] = true;
@@ -456,7 +450,7 @@ void CreateDestroyStreams()
         }
     }
 
-    for (int i = 0; i < MaxStream; i++) {
+    for (UINT i = 0; i < MaxStream; i++) {
         if (startY[i] > (screenHeight + BackTrace * textHeight)) {
             streamStatus[i] = false;
             streamCount--;
@@ -468,7 +462,7 @@ void CreateDestroyStreams()
 
 void UpdateStreams()
 {
-    for (int i = 0; i < MaxStream; i++) {
+    for (UINT i = 0; i < MaxStream; i++) {
         if (streamStatus[i]) {
             if (streamSpeed[i] == 0) {
                 startY[i] += textHeight;
@@ -483,7 +477,7 @@ void UpdateStreams()
 
 // number of charsacters used
 #define COUNT 254
-static char szBuffer[COUNT] = {
+static UINT szBuffer[COUNT] = {
       1,   2,   3,   4,   5,   6,   7,   8,   9,
      10,  11,  12,  13,  14,  15,  16,  17,  18,  19,
      20,  21,  22,  23,  24,  25,  26,  27,  28,  29,
@@ -525,7 +519,7 @@ void DisplayStreams(HWND hwnd)
 
     hdc = GetDC(hwnd);
 
-    if (hOldFont = (HFONT) SelectObject(hdc, hfont)) {
+    if ((hOldFont = (HFONT) SelectObject(hdc, hfont))) {
         GetTextMetrics(hdc, &tm);
         textHeight = tm.tmHeight;
         textWidth = tm.tmMaxCharWidth;
@@ -549,7 +543,7 @@ void DisplayStreams(HWND hwnd)
                                               g - streamOrigSpeed[i] * incG,
                                               b - streamOrigSpeed[i] * incB)
                         );
-                        TextOut(hdc, x , y - (j * textHeight), (szBuffer + (rand() * COUNT / 32767)), 1);
+                        TextOut(hdc, x , y - (j * textHeight), (char*) (szBuffer + (rand() * COUNT / 32767)), 1);
                     } else if (j==1) {
                         int incR = r / 3 / (SpeedDelay + 1);
                         int incG = g / 3 / (SpeedDelay + 1);
@@ -560,7 +554,7 @@ void DisplayStreams(HWND hwnd)
                                               g / 3 - streamOrigSpeed[i] * incG,
                                               b / 3 - streamOrigSpeed[i] * incB)
                         );
-                        TextOut(hdc, x, y - (j * textHeight), (szBuffer + (rand() * COUNT / 32767)), 1);
+                        TextOut(hdc, x, y - (j * textHeight), (char*) (szBuffer + (rand() * COUNT / 32767)), 1);
                     } else {
                         SetTextColor(hdc,RGB(0,0,0)); // erase
                         TextOut(hdc, x, y - (rand() * SpacePad / 32767 + Leading) * textHeight, "W", 1);
