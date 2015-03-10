@@ -533,7 +533,7 @@ void DisplayStreams(HWND hwnd)
                 y = startY[i];
 
                 for (int j = 0; j < 3; j++) {
-                    if (j==0) {
+                    if (j == 0) {
                         int incR = r / (SpeedDelay + 1);
                         int incG = g / (SpeedDelay + 1);
                         int incB = b / (SpeedDelay + 1);
@@ -556,7 +556,7 @@ void DisplayStreams(HWND hwnd)
                         );
                         TextOut(hdc, x, y - (j * textHeight), (char*) (szBuffer + (rand() * COUNT / 32767)), 1);
                     } else {
-                        SetTextColor(hdc,RGB(0,0,0)); // erase
+                        SetTextColor(hdc, RGB(0, 0, 0)); // erase
                         TextOut(hdc, x, y - (rand() * SpacePad / 32767 + Leading) * textHeight, "W", 1);
                         TextOut(hdc, x, y - (BackTrace) * textHeight, "W", 1);
                     }
