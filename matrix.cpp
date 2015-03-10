@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
-#include <string.h>
+#include <scrnsave.h>
 
 #include "res/resource.h"
 
 
-LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK DialogProc(HWND, UINT, WPARAM, LPARAM);
 void CheckUserDefinedValues();
 void CreateDestroyStreams();
 void UpdateStreams();
@@ -45,23 +46,14 @@ static HBITMAP hbitmap;
 static HBITMAP hbitmapOk, hbitmapOk1, hbitmapCancel, hbitmapCancel1;
 static HINSTANCE ghInstance;
 
-unsigned long datatype;
-unsigned long datasize;
+
 char szWinName[] = "MatrixSS";
 
 
-// We have 3 types of inputs command line arguments
-// - /c:dddd  configuration dialog
-// - /p dddd  preview, when we first switch to the window properties screen savers dialog
-// - /s       starts the screensaver
-// -          no command line starts the config dialog
-int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE /*hPrevInst*/, LPSTR lpszArgs, int nWinMode)
+void load_parameters()
 {
-    HWND hwnd;
-    MSG msg;
-    WNDCLASSEX wc;
-
-    ghInstance = hThisInst;
+    unsigned long datatype;
+    unsigned long datasize;
 
     // set the values
     RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\louai\\Screensaver\\MatrixCode",
@@ -98,70 +90,26 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE /*hPrevInst*/, LPSTR lpszArgs,
 
     screenWidth = GetSystemMetrics(SM_CXSCREEN);
     screenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-    // I need this because windows continously calls the screen saver to start the program
-    // in no time at all I would have 2000 instances of this code *shiver*
-    if (!(FindWindow(szWinName, NULL) == NULL))
-        return 0;
-
-    if (_strnicmp("/s", lpszArgs, 2) == 0) {
-        goto startApp; // ignore, we will start normally
-    } else if (_strnicmp("/c", lpszArgs, 2) == 0) {
-        // note to self, add a dialog here to configure the screensaver, hook to the registry
-        DialogBox(hThisInst, MAKEINTRESOURCE(IDD_DIALOG_MATRIX), NULL, (DLGPROC) DialogProc);
-        return 0;
-    } else  if (strlen(lpszArgs) > 0) {
-        return 0; // exit
-    }
-
-    DialogBox(hThisInst, MAKEINTRESOURCE(IDD_DIALOG_MATRIX), NULL, (DLGPROC) DialogProc);
-    return 0;
-
-startApp:
-
-    ShowCursor(false);
-    // Define a window class
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.hInstance = hThisInst;
-    wc.lpszClassName = szWinName;
-    wc.lpfnWndProc = WindowProc;
-    wc.style = 0;
-
-    wc.hIcon = LoadIcon(NULL, MAKEINTRESOURCE(IDI_ICON_MATRIX));
-    wc.hIconSm = LoadIcon(NULL, MAKEINTRESOURCE(IDI_ICON_MATRIX));
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-
-    wc.lpszMenuName = NULL;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-
-    wc.hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH);
-
-    if (!RegisterClassEx(&wc)) return 0;
-
-    hwnd = CreateWindow(szWinName, "Matrix Code", WS_POPUP, 0, 0, screenWidth,
-                        screenHeight, HWND_DESKTOP, NULL, hThisInst, NULL);
-    ShowWindow(hwnd,nWinMode);
-    UpdateWindow(hwnd);
-
-    while (GetMessage(&msg, NULL, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-
-    return msg.wParam;
 }
 
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LONG WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-    static int mousecounter = 0;
-    static int mouseDelay = 2; // how many clicks/keypresses to wait before killing app
+    static UINT uTimer = 0; // Timer for the screen saver
 
-    switch(message) {
+    load_parameters();
+
+    switch (message) {
         case WM_CREATE:
-            hfont = (HFONT)GetStockObject(OEM_FIXED_FONT);
-            SetTimer(hwnd, 309, 50, NULL);
+            hfont = (HFONT) GetStockObject(OEM_FIXED_FONT);
+            uTimer = (UINT) SetTimer(hwnd, 309, 50, NULL);
+
+            srand(time(0));
+
+            CheckUserDefinedValues();
+
+            screenWidth = GetSystemMetrics(SM_CXSCREEN);
+            screenHeight = GetSystemMetrics(SM_CYSCREEN);
             break;
 
         case WM_TIMER:
@@ -170,31 +118,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             DisplayStreams(hwnd);
             break;
 
-        case WM_KEYDOWN:
-        case WM_MOUSEMOVE:
-            mousecounter++;
-            if (mousecounter > mouseDelay) SendMessage(hwnd, WM_CLOSE, 7777, 0);
-            break;
-
-        case WM_CLOSE:
-            // windows has this annoying habit of randomly closing the screen saver
-            // thus if the WM_CLOSE is not sent by me I will ignore it
-            // if windows sends a WM_DESTROY I let it pass since this is a more extreme form
-            // of closure
-            if (wParam != 7777) return 0;
-            DestroyWindow(hwnd);
-            break;
-
         case WM_DESTROY:
-            ShowCursor(true);
+            KillTimer(hwnd, uTimer);
             DeleteObject(hfont);
+            DestroyWindow(hwnd);
             PostQuitMessage(0);
             break;
-
         default:
-            return DefWindowProc(hwnd, message, wParam, lParam);
+            return DefScreenSaverProc(hwnd, message, wparam, lparam);
     }
-
     return 0;
 }
 
@@ -209,7 +141,7 @@ int OnCtlColor(HWND /*hDlg*/, HDC hDC)
 
 #define kSS 256
 
-BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
+BOOL WINAPI ScreenSaverConfigureDialog(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
 {
     int w, h;
     RECT rect;
@@ -219,7 +151,6 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
     PAINTSTRUCT ps;
 
     char szDebug[kSS];
-
 
     // state 1=ok sel, 2=cancel sel, 3=ok unsel, 4=cancel unsel
     static int buttonState = 0;
@@ -401,6 +332,13 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
     }
 
     return FALSE;
+}
+
+
+BOOL WINAPI RegisterDialogClasses(HANDLE hmodule)
+{
+    ghInstance = (HINSTANCE) hmodule;
+    return true;
 }
 
 

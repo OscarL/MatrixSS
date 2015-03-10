@@ -3,7 +3,7 @@
 // Used by ScriptMatrix.rc
 //
 #define IDI_ICON_MATRIX                 102
-#define IDD_DIALOG_MATRIX               103
+#define IDD_DIALOG_MATRIX               2003
 #define IDB_BITMAP_TEST                 104
 #define IDB_BITMAP_TEST_OK              106
 #define IDB_BITMAP_TEST_OK1             108
