@@ -7,8 +7,6 @@
 #include "res/resource.h"
 
 
-#define MB(txt) (MessageBox(NULL, txt, "debug", MB_OK))
-
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 BOOL CALLBACK DialogProc(HWND, UINT, WPARAM, LPARAM);
 void CheckUserDefinedValues();
@@ -17,15 +15,9 @@ void UpdateStreams();
 void DisplayStreams(HWND hwnd);
 int OnCtlColor(HWND, HDC);
 
-char szWinName[] = "MatrixSS";
-
 
 // the max possible size for all streams
 #define MAX 10000
-// konstantStringSize
-#define kSS 256
-
-char szDebug[kSS];
 
 unsigned long MaxStream = 1000; // max number of streams to use
 unsigned long BackTrace = 40; // number of characters behind to erase the trail
@@ -37,25 +29,9 @@ unsigned long r = 150;
 unsigned long g = 255;
 unsigned long b = 100;
 
-unsigned long datatype;
-unsigned long datasize;
-
-static int startX[MAX];
-static int startY[MAX];
-static int streamSpeed[MAX];
-static int streamOrigSpeed[MAX];
-static bool streamStatus[MAX];
-static unsigned long streamCount = 0;
-
 
 // hfont to diplay on screen
 HFONT hfont;
-// store the old font handle which we restore when we end he paint session
-HFONT hOldFont;
-
-//used to calculate the offsets needed to draw the next character below or across in a new stream
-static int textHeight = 12; // place holders recalculated in code
-static int textWidth = 8; // place holders recalculated in code
 
 static int screenWidth;
 static int screenHeight;
@@ -69,38 +45,9 @@ static HBITMAP hbitmap;
 static HBITMAP hbitmapOk, hbitmapOk1, hbitmapCancel, hbitmapCancel1;
 static HINSTANCE ghInstance;
 
-static TEXTMETRIC tm;
-
-// number of charsacters used
-#define COUNT 254
-static char szBuffer[COUNT] = {
-      1,   2,   3,   4,   5,   6,   7,   8,   9,
-     10,  11,  12,  13,  14,  15,  16,  17,  18,  19,
-     20,  21,  22,  23,  24,  25,  26,  27,  28,  29,
-     30,  31,  32,  33,  34,  35,  36,  37,  38,  39,
-     40,  41,  42,  43,  44,  45,  46,  47,  48,  49,
-     50,  51,  52,  53,  54,  55,  56,  57,  58,  59,
-     60,  61,  62,  63,  64,  65,  66,  67,  68,  69,
-     70,  71,  72,  73,  74,  75,  76,  77,  78,  79,
-     80,  81,  82,  83,  84,  85,  86,  87,  88,  89,
-     90,  91,  92,  93,  94,  95,  96,  97,  98,  99,
-    100, 101, 102, 103, 104, 105, 106, 107, 108, 109,
-    110, 111, 112, 113, 114, 115, 116, 117, 118, 119,
-    120, 121, 122, 123, 124, 125, 126, 127, 128, 129,
-    130, 131, 132, 133, 134, 135, 136, 137, 138, 139,
-    140, 141, 142, 143, 144, 145, 146, 147, 148, 149,
-    150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
-    160, 161, 162, 163, 164, 165, 166, 167, 168, 169,
-    170, 171, 172, 173, 174, 175, 176, 177, 178, 179,
-    180, 181, 182, 183, 184, 185, 186, 187, 188, 189,
-    190, 191, 192, 193, 194, 195, 196, 197, 198, 199,
-    200, 201, 202, 203, 204, 205, 206, 207, 208, 209,
-    210, 211, 212, 213, 214, 215, 216, 217, 218, 219,
-    220, 221, 222, 223, 224, 225, 226, 227, 228, 229,
-    230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
-    240, 241, 242, 243, 244, 245, 246, 247, 248, 249,
-    250, 251, 252, 253, 254
-};
+unsigned long datatype;
+unsigned long datasize;
+char szWinName[] = "MatrixSS";
 
 
 // We have 3 types of inputs command line arguments
@@ -152,9 +99,6 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR lpszArgs, int
     screenWidth = GetSystemMetrics(SM_CXSCREEN);
     screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    // _snprintf(szDebug, 256, "CommandLine:> %s", lpszArgs);
-    // MB(szDebug);
-
     // I need this because windows continously calls the screen saver to start the program
     // in no time at all I would have 2000 instances of this code *shiver*
     if (!(FindWindow(szWinName, NULL) == NULL))
@@ -200,9 +144,6 @@ startApp:
     ShowWindow(hwnd,nWinMode);
     UpdateWindow(hwnd);
 
-    // _snprintf(szDebug, kSS, "MaxStream: %d\nBackTrace: %d\nLeading: %d\nSpacePad: %d\nSpeedDelay %d", MaxStream, BackTrace, Leading, SpacePad, SpeedDelay);
-    // MB(szDebug);
-
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -220,10 +161,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
     switch(message) {
         case WM_CREATE:
             hfont = (HFONT)GetStockObject(OEM_FIXED_FONT);
-            /*
-            hfont = CreateFont(12, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-                               CLIP_DEFAULT_PRECIS, DRAFT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "System");
-            */
             SetTimer(hwnd, 309, 50, NULL);
             break;
 
@@ -262,6 +199,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
 }
 
 
+int OnCtlColor(HWND hDlg, HDC hDC)
+{
+    SetTextColor(hDC, RGB(255, 255, 255));
+    SetBkColor(hDC, RGB(0, 0, 0));
+    return ((int) GetStockObject(BLACK_BRUSH));
+}
+
+
+#define kSS 256
+
 BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
 {
     int w, h;
@@ -271,6 +218,9 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
     int fwkeys;
     HDC hmemdc;
     PAINTSTRUCT ps;
+
+    char szDebug[kSS];
+
 
     // state 1=ok sel, 2=cancel sel, 3=ok unsel, 4=cancel unsel
     static int buttonState = 0;
@@ -287,9 +237,6 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
 
             SetWindowPos(hdlg, HWND_NOTOPMOST, x, y, cx, cy, SWP_SHOWWINDOW);
             // center the dialog box
-
-            // _snprintf(szDebug, kSS, "x, y, x1, y1 %d, %d, %d, %d", rect.left, rect.top, rect.right, rect.bottom);
-            // MB(szDebug);
 
             _snprintf(szDebug, kSS, "%d", MaxStream);
             Edit_SetText(GetDlgItem(hdlg, IDC_EDIT_MAXSTREAMS), szDebug);
@@ -444,10 +391,10 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
             break;
 
         case WM_CLOSE:
-            // windows has this annoying habit of randomly closing the screen saver
-            // thus if the WM_CLOSE is not sent by me I will ignore it
-            // if windows sends a WM_DESTROY I let it pass since this is a more extreme form
-            // of closure
+            // windows has this annoying habit of randomly closing the screen
+            // saver thus if the WM_CLOSE is not sent by me I will ignore it if
+            // windows sends a WM_DESTROY I let it pass since this is a more
+            //  extreme form of closure
             if (wparam != 7777) return FALSE;
             EndDialog(hdlg, 0);
             DeleteObject(hbitmap);
@@ -458,6 +405,18 @@ BOOL CALLBACK DialogProc(HWND hdlg, UINT imsg, WPARAM wparam, LPARAM lparam)
 
     return FALSE;
 }
+
+
+//------------------------------------------------------------------------------
+// The good stuff:
+
+
+static int startX[MAX];
+static int startY[MAX];
+static int streamSpeed[MAX];
+static int streamOrigSpeed[MAX];
+static bool streamStatus[MAX];
+static unsigned long streamCount = 0;
 
 
 // global settings for the screen saver
@@ -474,6 +433,11 @@ void CheckUserDefinedValues()
     if (g < 0) g = 0;
     if (b < 0) b = 0;
 }
+
+
+//used to calculate the offsets needed to draw the next character below or across in a new stream
+static int textHeight = 12; // place holders recalculated in code
+static int textWidth = 8; // place holders recalculated in code
 
 
 void CreateDestroyStreams()
@@ -515,6 +479,43 @@ void UpdateStreams()
         }
     }
 }
+
+
+// number of charsacters used
+#define COUNT 254
+static char szBuffer[COUNT] = {
+      1,   2,   3,   4,   5,   6,   7,   8,   9,
+     10,  11,  12,  13,  14,  15,  16,  17,  18,  19,
+     20,  21,  22,  23,  24,  25,  26,  27,  28,  29,
+     30,  31,  32,  33,  34,  35,  36,  37,  38,  39,
+     40,  41,  42,  43,  44,  45,  46,  47,  48,  49,
+     50,  51,  52,  53,  54,  55,  56,  57,  58,  59,
+     60,  61,  62,  63,  64,  65,  66,  67,  68,  69,
+     70,  71,  72,  73,  74,  75,  76,  77,  78,  79,
+     80,  81,  82,  83,  84,  85,  86,  87,  88,  89,
+     90,  91,  92,  93,  94,  95,  96,  97,  98,  99,
+    100, 101, 102, 103, 104, 105, 106, 107, 108, 109,
+    110, 111, 112, 113, 114, 115, 116, 117, 118, 119,
+    120, 121, 122, 123, 124, 125, 126, 127, 128, 129,
+    130, 131, 132, 133, 134, 135, 136, 137, 138, 139,
+    140, 141, 142, 143, 144, 145, 146, 147, 148, 149,
+    150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
+    160, 161, 162, 163, 164, 165, 166, 167, 168, 169,
+    170, 171, 172, 173, 174, 175, 176, 177, 178, 179,
+    180, 181, 182, 183, 184, 185, 186, 187, 188, 189,
+    190, 191, 192, 193, 194, 195, 196, 197, 198, 199,
+    200, 201, 202, 203, 204, 205, 206, 207, 208, 209,
+    210, 211, 212, 213, 214, 215, 216, 217, 218, 219,
+    220, 221, 222, 223, 224, 225, 226, 227, 228, 229,
+    230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
+    240, 241, 242, 243, 244, 245, 246, 247, 248, 249,
+    250, 251, 252, 253, 254
+};
+
+
+static TEXTMETRIC tm;
+// store the old font handle which we restore when we end he paint session
+HFONT hOldFont;
 
 
 void DisplayStreams(HWND hwnd)
@@ -572,12 +573,4 @@ void DisplayStreams(HWND hwnd)
         SelectObject(hdc, hOldFont);
     }
     ReleaseDC(hwnd, hdc);
-}
-
-
-int OnCtlColor(HWND hDlg, HDC hDC)
-{
-    SetTextColor (hDC, RGB(255, 255, 255));
-    SetBkColor (hDC, RGB(0, 0, 0));
-    return ((int) GetStockObject(BLACK_BRUSH));
 }
