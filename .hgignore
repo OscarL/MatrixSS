@@ -1,0 +1,4 @@
+syntax: glob
+res/MatrixSS.res
+matrix.o
+MatrixSS.scr

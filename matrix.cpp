@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <string.h>
-#include "resource.h"
+#include "res/resource.h"
 
 #define MB(txt) (MessageBox(NULL,txt,"debug",MB_OK))
 
@@ -224,7 +224,7 @@ startApp:
 LRESULT CALLBACK WindowProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 	static int mousecounter = 0;
-	static mouseDelay = 2;			// how many clicks/keypresses to wait before killing app
+	static int mouseDelay = 2;			// how many clicks/keypresses to wait before killing app
 	switch(message)
 	{
 	case WM_CREATE:
