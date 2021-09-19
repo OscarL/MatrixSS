@@ -87,12 +87,9 @@ Maybe:
 Links
 -----
 
-- [Louai's original Matrix ScreenSsver webpage](http://elouai.com/the_matrix_screensaver.php)
+- [Louai's original Matrix ScreenSaver webpage](http://elouai.com/the_matrix_screensaver.php)
 
-The web.archive.org has the original pages (on louai.com) too!:
-
-https://web.archive.org/web/20010203155900/http://louai.com/coding.html
-https://web.archive.org/web/20000914170532if_/http://www.louai.com:80/coding/matrixsrc.zip (ver 1.2 source code)
+The web.archive.org has the original pages (on louai.com) too!: [louai.com/coding.html](https://web.archive.org/web/20010203155900/http://louai.com/coding.html), and [ver 1.2 source code](https://web.archive.org/web/20000914170532if_/http://www.louai.com:80/coding/matrixsrc.zip).
 
 
 License
