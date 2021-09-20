@@ -24,7 +24,7 @@ Now that a new Matrix movie is near (Dec 2021), it is time for this screen-saver
 Changes on this version
 -----------------------
 
-* Changed from a standard Windows 9x .exe to a proper screen server binary:
+* Changed from a standard Windows 9x .exe to a proper screen saver binary:
   * Makes it work on Windows XP (tested also on 7 32 bits, and 10 64 bit).
   * Also makes the preview work in the [Screen Saver selection dialog](screenshots/MatrixSS_Win7-ScreenSaverDialog.png)
 * Somewhat cleaner source code (at least, in my opinion, YMMV).
