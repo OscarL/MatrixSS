@@ -4,7 +4,9 @@ Matrix Screen Saver
 What is it?
 -----------
 
-As no one can be told what The Matrix is... see [the screenshot](screenshots/MatrixSS_1920x1080.png).
+A screensaver that looks like this (showing just a freeze frame here because I'm lazy):
+
+![the screenshot](screenshots/MatrixSS_1920x1080.png)
 
 
 Now that you know
