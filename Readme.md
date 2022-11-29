@@ -43,7 +43,7 @@ What is it good for
 Usage:
 ------
 
-Download the [MatrixSS.7z](MatrixSS.7z) file, extract "MatrixSS.scr" to a suitable directory, right-click on it, select: "Test", "Config", or "Install" as you wish.
+Download the [MatrixSS.7z](https://github.com/OscarL/MatrixSS/releases/download/v1.0/MatrixSS.7z) file, extract "MatrixSS.scr" to a suitable directory, right-click on it, select: "Test", "Config", or "Install" as you wish.
 
 
 Building
