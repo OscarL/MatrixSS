@@ -88,8 +88,8 @@ void load_parameters()
     // check to make sure values are within reason
     CheckUserDefinedValues();
 
-    screenWidth = GetSystemMetrics(SM_CXSCREEN);
-    screenHeight = GetSystemMetrics(SM_CYSCREEN);
+    screenWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    screenHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
 }
 
 
@@ -108,8 +108,8 @@ LONG WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpara
 
             CheckUserDefinedValues();
 
-            screenWidth = GetSystemMetrics(SM_CXSCREEN);
-            screenHeight = GetSystemMetrics(SM_CYSCREEN);
+            screenWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+            screenHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
             break;
 
         case WM_TIMER:
@@ -157,8 +157,8 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hdlg, UINT imsg, WPARAM wparam, LPAR
 
     switch (imsg) {
         case WM_INITDIALOG:
-            w = GetSystemMetrics(SM_CXSCREEN);
-            h = GetSystemMetrics(SM_CYSCREEN);
+            w = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+            h = GetSystemMetrics(SM_CYVIRTUALSCREEN);
             GetWindowRect(hdlg, &rect);
             cx = rect.right - rect.left;
             cy = rect.bottom - rect.top;
