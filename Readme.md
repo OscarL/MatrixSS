@@ -30,6 +30,7 @@ Changes on this version
   * Makes it work on Windows XP (tested also on 7 32 bits, and 10 64 bit).
   * Also makes the preview work in the [Screen Saver selection dialog](screenshots/MatrixSS_Win7-ScreenSaverDialog.png)
 * Somewhat cleaner source code (at least, in my opinion, YMMV).
+* Multi-monitor support (since v1.1).
 
 
 What is it good for
@@ -45,7 +46,7 @@ What is it good for
 Usage:
 ------
 
-Download the [MatrixSS.7z](https://github.com/OscarL/MatrixSS/releases/download/v1.0/MatrixSS.7z) file, extract "MatrixSS.scr" to a suitable directory, right-click on it, select: "Test", "Config", or "Install" as you wish.
+Download the [MatrixSS-v1.1.7z](https://github.com/OscarL/MatrixSS/releases/download/v1.1/MatrixSS-v1.1.7z) file, extract "MatrixSS.scr" to a suitable directory, right-click on it, select: "Test", "Config", or "Install" as you wish.
 
 
 Building
