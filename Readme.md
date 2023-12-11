@@ -1,16 +1,15 @@
 Matrix Screen Saver
 ===================
 
-What is it?
------------
+A really lightweight Screen Saver that looks something like this:
 
-A screensaver that looks like this (showing just a freeze frame here because I'm lazy):
+![Animated Screencapture](screenshots/Screencapture-720p-15fps.gif)
 
-![the screenshot](screenshots/MatrixSS_1920x1080.png)
+Freeze-frame at 1920x1080: [FullHD screenshot](screenshots/MatrixSS_1920x1080.png).
 
 
-Now that you know
------------------
+A bit of history
+----------------
 
 This is an updated version of Louai Munajim's Matrix screen saver, the simplest, and best one, ever created.
 
@@ -22,6 +21,7 @@ I've originally made this version in 2015, but never published. Six and a half y
 
 Now that a new Matrix movie is near (Dec 2021), it is time for this screen-saver's resurrection!
 
+(Narrator in 2023: Matrix Resurrections was a "meh" at best, oh well, MatrixSS still rocks!)
 
 Changes on this version
 -----------------------
