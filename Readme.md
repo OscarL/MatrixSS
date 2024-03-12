@@ -111,6 +111,6 @@ Tools used for this updated version
 - [clink](https://github.com/chrisant996/clink/) (cmd.exe's console improvements)
 - [GOW](https://github.com/bmatzelle/gow/) (Gnu on Windows, lightweight ports of common *nix tools)
 - [Dev-C++](https://bloodshed.net/) 5.9.2 (IDE)
-- [MinGW64](https://www.mingw-w64.org/)https://www.mingw-w64.org/ (compiler/libraries)
+- [MinGW64](https://www.mingw-w64.org/) (compiler/libraries)
 
 Insted of the latter two, you might want to use one of the "Dev-C++ + TDM-GCC" combos from https://github.com/Embarcadero/Dev-Cpp/releases
