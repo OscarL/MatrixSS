@@ -40,7 +40,7 @@ What is it good for
 * Making your friends go: "Whoa!".
 * Learning how to write a screen saver on Windows.
 * Exercising my rusty programming skills.
-* Serve as a base for a future port for Haiku OS.
+* Serve as a base for a future port for [Haiku](https://www.haiku-os.org/).
 
 
 Usage:
@@ -108,7 +108,9 @@ So, I'll keep it under [CC by 3.0](http://creativecommons.org/licenses/by/3.0/) 
 Tools used for this updated version
 -----------------------------------
 
-- clink (cmd.exe's console improvements)
-- GOW (Gnu on Windows, lightweight ports of common *nix tools)
-- Dev-C++ 5.9.2 (IDE)
-- MinGW64 (compiler/libraries)
+- [clink](https://github.com/chrisant996/clink/) (cmd.exe's console improvements)
+- [GOW](https://github.com/bmatzelle/gow/) (Gnu on Windows, lightweight ports of common *nix tools)
+- [Dev-C++](https://bloodshed.net/) 5.9.2 (IDE)
+- [MinGW64](https://www.mingw-w64.org/)https://www.mingw-w64.org/ (compiler/libraries)
+
+Insted of the latter two, you might want to use one of the "Dev-C++ + TDM-GCC" combos from https://github.com/Embarcadero/Dev-Cpp/releases
